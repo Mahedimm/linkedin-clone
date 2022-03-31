@@ -45,10 +45,12 @@ const Feed = ({posts}) => {
     
 
     return (
-        <div className="space-y-6 pb-24 max-w-lg">
+        <div className="space-y-6 pb-24 max-w-xl">
+
+        {/* create post */}
            <Input />
 
-           {/* POSt */}
+           {/* POSts */}
            {!useSSRPosts
             ? realtimePosts.map((post) => <Post key={post._id} post={post} />)
             : posts.map((post) => <Post key={post._id} post={post} />)}
