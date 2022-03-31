@@ -9,8 +9,10 @@ import Header from '../components/Header';
 import Modal from '../components/Modal';
 import Sidebar from '../components/Sidebar';
 import Widgets from '../components/Widgets';
+import { connectToDatabase } from "../util/mongodb";
 
-export default function Home() {
+export default function Home({posts}) {
+  console.log(posts);
   const [modalOpen, setModalOpen] = useRecoilState(modalState);
   const [modalType, setModalType] = useRecoilState(modalTypeState);
   const router = useRouter();
@@ -35,7 +37,7 @@ export default function Home() {
              {/* sidebar */}
              <Sidebar />
               {/* Feed */}
-              <Feed />
+              <Feed posts={posts}/>
           </div>
          {/* widgets */}
          <Widgets />
@@ -59,9 +61,32 @@ export default function Home() {
         }
       }
     }
+    //get post on ssr
+    const {db} = await connectToDatabase();
+    const posts = await db
+    .collection("posts")
+    .find()
+    .sort({ timestamp: -1 })
+    .toArray();
+
+      // Get Google News API
+  // const results = await fetch(
+  //   `https://newsapi.org/v2/top-headlines?country=bd&apiKey=${process.env.NEWS_API_KEY}`
+  // ).then((res) => res.json());
+
     return {
       props: {
         session,
+        // articles: results.articles,
+        posts: posts.map((post) => ({
+        _id: post._id.toString(),
+        input: post.input,
+        photoUrl: post.photoUrl,
+        username: post.username,
+        email: post.email,
+        userImg: post.userImg,
+        createdAt: post.createdAt,
+      })),
       }
     }
   }
